@@ -1,5 +1,5 @@
 // File: server/utils/notificationService.js
-import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
 import fs from "fs";
 import dotenv from 'dotenv';
 
@@ -7,12 +7,12 @@ dotenv.config();
 
 export const sendEmergencyNotifications = async (user, alertData) => {
 
-    if (!process.env.RESEND_API_KEY || !process.env.EMAIL_USER) {
-        console.error("❌ CRITICAL ERROR: Resend config missing. Add RESEND_API_KEY and EMAIL_USER to .env");
+    if (!process.env.SENDGRID_API_KEY || !process.env.EMAIL_USER) {
+        console.error("❌ CRITICAL ERROR: SendGrid config missing.");
         return;
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     console.log(`\n--- 🚨 SENDING ALERT FOR: ${user.username} ---`);
 
@@ -77,25 +77,19 @@ export const sendEmergencyNotifications = async (user, alertData) => {
     for (const contact of user.contacts) {
         if (contact.type !== "EMAIL") continue;
 
-        try {
-            const { data, error } = await resend.emails.send({
-                from: "Safety App <onboarding@resend.dev>",
-                to: [contact.value],
-                subject: `🚨 SOS ALERT: ${user.username} needs help!`,
-                html: htmlBody,
-                attachments: attachments.map(a => ({
-                    filename: a.filename,
-                    content: a.content,
-                })),
-            });
+        const msg = {
+            to: contact.value,
+            from: process.env.EMAIL_USER,
+            subject: `🚨 SOS ALERT: ${user.username} needs help!`,
+            html: htmlBody,
+            attachments: attachments
+        };
 
-            if (error) {
-                console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error);
-            } else {
-                console.log(`✅ [EMAIL SENT] To ${contact.name} | ID: ${data.id}`);
-            }
+        try {
+            await sgMail.send(msg);
+            console.log(`✅ [EMAIL SENT] To ${contact.name}`);
         } catch (error) {
-            console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error.message);
+            console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error.response ? error.response.body : error.message);
         }
     }
 };
