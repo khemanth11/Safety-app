@@ -1,37 +1,59 @@
 /* File: client/src/App.css */
+
+/* --- 1. THE GLOBAL HACKER THEME --- */
 body {
-  background-color: #050505;
-  /* Deepest black */
-  color: #e0e0e0;
-  font-family: 'Courier New', Courier, monospace;
-  /* Spy/Hacker font */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   margin: 0;
-  overflow: hidden;
-  /* Stop scrolling */
+  background-color: #050505; /* Deepest black */
+  color: #0f0; /* Terminal Green */
+  font-family: 'Courier New', Courier, monospace; /* Spy Font */
+  overflow-x: hidden; /* Prevent side scrolling */
+  min-height: 100vh;
 }
 
-/* --- SHARED SPY THEME --- */
+/* --- 2. THE BACKGROUND GRID (Sci-Fi Effect) --- */
+.dashboard-container, body {
+  background-image: 
+    linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px; /* Creates the tactical grid */
+  position: relative;
+}
+
+/* Scanline animation (The moving CRT line) */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02));
+  z-index: 999;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none; /* Allows clicking through it */
+}
+
+/* --- 3. AUTH & SHARED CONTAINERS --- */
 .auth-container {
   width: 100%;
   max-width: 400px;
   padding: 40px;
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid #333;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+  margin: 50px auto; /* Centering */
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid #0f0; /* Glowing Green Border */
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
   text-align: center;
-  animation: fadeIn 0.8s ease-out;
+  position: relative;
+  z-index: 1000;
 }
 
-h1,
-h2 {
+h1, h2 {
   color: #fff;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
+  text-shadow: 0 0 10px #0f0; /* Glowing Text */
+  letter-spacing: 3px;
+  margin-bottom: 25px;
   text-transform: uppercase;
 }
 
@@ -42,21 +64,20 @@ h2 {
   background-color: #000;
   border: 1px solid #333;
   color: #0f0;
-  /* Hacker Green text */
   font-family: 'Courier New', monospace;
   font-size: 16px;
   border-radius: 5px;
   box-sizing: border-box;
-  /* Fixes padding issues */
   transition: all 0.3s ease;
 }
 
 .spy-input:focus {
   outline: none;
   border-color: #0f0;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
 }
 
+/* --- 4. BUTTONS (Tactical Style) --- */
 .spy-btn {
   width: 100%;
   padding: 15px;
@@ -65,34 +86,35 @@ h2 {
   font-weight: bold;
   text-transform: uppercase;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
   font-family: 'Courier New', monospace;
+  position: relative;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); /* Sci-Fi Corner Cut */
+  transition: all 0.2s;
 }
 
 .btn-primary {
-  background-color: #004400;
+  background: rgba(0, 50, 0, 0.9);
   color: #0f0;
   border: 1px solid #0f0;
 }
 
 .btn-primary:hover {
-  background-color: #0f0;
+  background: #0f0;
   color: #000;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+  box-shadow: 0 0 20px #0f0;
 }
 
 .btn-secondary {
-  background-color: #000;
+  background: #000;
   color: #0088ff;
   border: 1px solid #0088ff;
 }
 
 .btn-secondary:hover {
-  background-color: #0088ff;
+  background: #0088ff;
   color: #000;
-  box-shadow: 0 0 20px rgba(0, 136, 255, 0.4);
+  box-shadow: 0 0 20px #0088ff;
 }
 
 .link-text {
@@ -100,14 +122,111 @@ h2 {
   font-size: 12px;
   color: #666;
   cursor: pointer;
+  display: block;
+}
+.link-text:hover { color: #fff; text-decoration: underline; }
+
+/* --- 5. DASHBOARD LAYOUT --- */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
 }
 
-.link-text:hover {
-  color: #fff;
-  text-decoration: underline;
+.header-section {
+  text-align: center;
+  margin-bottom: 20px;
+  z-index: 10;
+  border-bottom: 1px solid #333;
+  width: 100%;
+  max-width: 500px;
+  padding-bottom: 10px;
 }
 
-/* --- CALCULATOR STYLES --- */
+/* --- 6. THE PULSING SOS BUTTON (Red Heartbeat) --- */
+.panic-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  z-index: 10;
+}
+
+.panic-btn {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff0000 0%, #500000 100%);
+  border: 4px solid #ff4444;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 30px #ff0000, inset 0 0 20px #500000;
+  animation: pulse 1.5s infinite; /* Faster Heartbeat */
+  z-index: 100;
+  text-shadow: 0 0 5px black;
+}
+
+.panic-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 60px #ff0000;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 0, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* --- 7. STATUS BAR --- */
+.status-bar {
+  background: #000;
+  color: #0ff; /* Cyan Status */
+  padding: 10px 20px;
+  border: 1px solid #0ff;
+  border-radius: 0; /* Square edges for tactical look */
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  z-index: 10;
+}
+
+/* --- 8. TACTICAL MENU --- */
+.tactical-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+  z-index: 10;
+  padding-bottom: 50px;
+}
+
+/* Reusing spy-btn styles, but specific overrides if needed */
+.tactical-menu .spy-btn {
+  margin-top: 0; /* Remove top margin in grid */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Danger Button Override */
+.spy-btn.danger {
+  border-color: #ffaa00;
+  color: #ffaa00;
+}
+.spy-btn.danger:hover {
+  background: #ffaa00;
+  color: #000;
+  box-shadow: 0 0 15px #ffaa00;
+}
+
+/* --- 9. CALCULATOR (Disguise Mode) --- */
 .calculator-container {
   width: 350px;
   background-color: #000;
@@ -115,13 +234,15 @@ h2 {
   border-radius: 30px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
   border: 2px solid #222;
+  margin: 50px auto;
+  z-index: 1000;
+  position: relative;
 }
 
 .display {
   background-color: #0a0a0a;
   color: white;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Keep normal font for disguise */
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Keep normal font for disguise */
   font-size: 4rem;
   text-align: right;
   padding: 20px;
@@ -146,129 +267,20 @@ button {
   transition: opacity 0.2s;
 }
 
-button:active {
-  opacity: 0.7;
-}
+button:active { opacity: 0.7; }
+.btn-gray { background-color: #a5a5a5; color: black; }
+.btn-dark { background-color: #333333; color: white; }
+.btn-orange { background-color: #ff9f0a; color: white; }
+.btn-zero { grid-column: span 2; width: 100%; border-radius: 40px; }
 
-.btn-gray {
-  background-color: #a5a5a5;
-  color: black;
-}
-
-.btn-dark {
-  background-color: #333333;
-  color: white;
-}
-
-.btn-orange {
-  background-color: #ff9f0a;
-  color: white;
-}
-
-.btn-zero {
-  grid-column: span 2;
-  width: 100%;
-  border-radius: 40px;
-}
-
-/* --- DASHBOARD STYLES --- */
-.dashboard-container {
-  text-align: center;
-  color: white;
-  padding: 20px;
-  animation: fadeIn 1s ease-in;
-}
-
-.panic-btn {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  border: none;
-  background: radial-gradient(circle, #ff4b4b 0%, #cc0000 100%);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
-  animation: pulse 2s infinite;
-  margin-top: 40px;
-}
-
-.status-box {
-  margin-top: 30px;
-  padding: 15px;
-  border: 1px solid #0f0;
-  background-color: #001100;
-  border-radius: 5px;
-  font-family: 'Courier New', monospace;
-  color: #0f0;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
-  }
-
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
-  }
-
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-  }
-}
-
-
+/* --- 10. RESPONSIVE --- */
 @media (max-width: 500px) {
-  .calculator-container {
-    width: 100%;
-    padding: 15px;
-    border: none;
-  }
-
-  .display {
-    font-size: 3rem;
-    height: 60px;
-    padding: 15px;
-  }
-
-  button {
-    width: 60px;
-    height: 60px;
-    font-size: 1.2rem;
-  }
-
-  .btn-zero {
-    border-radius: 30px;
-  }
+  .calculator-container { width: 100%; padding: 15px; border: none; }
+  .display { font-size: 3rem; height: 60px; }
+  button { width: 60px; height: 60px; font-size: 1.2rem; }
 }
+
 @media (max-width: 400px) {
-  .auth-container {
-    padding: 30px;
-  }
-
-  .spy-input {
-    padding: 12px;
-    font-size: 14px;
-  }
-
-  .spy-btn {
-    padding: 12px;
-    font-size: 14px;
-  }
+  .auth-container { padding: 20px; width: 90%; }
+  .panic-btn { width: 150px; height: 150px; font-size: 1.8rem; }
 }

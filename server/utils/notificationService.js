@@ -1,5 +1,5 @@
 // File: server/utils/notificationService.js
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 import fs from "fs";
 import dotenv from 'dotenv';
 
@@ -7,19 +7,25 @@ dotenv.config();
 
 export const sendEmergencyNotifications = async (user, alertData) => {
 
-    if (!process.env.SENDGRID_API_KEY || !process.env.EMAIL_USER) {
-        console.error("❌ CRITICAL ERROR: SendGrid config missing.");
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("❌ CRITICAL ERROR: Gmail config missing. Add EMAIL_USER and EMAIL_PASS to .env");
         return;
     }
 
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    // Create Gmail transporter
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS, // Use Gmail App Password (16-char)
+        },
+    });
 
     console.log(`\n--- 🚨 SENDING ALERT FOR: ${user.username} ---`);
 
     const lat = alertData.location.latitude;
     const lng = alertData.location.longitude;
 
-    // FIX: The standard Google Maps URL
     const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
 
     // 1. HANDLE AUDIO ATTACHMENT
@@ -29,10 +35,9 @@ export const sendEmergencyNotifications = async (user, alertData) => {
             const filePath = `.${alertData.audioUrl}`;
             if (fs.existsSync(filePath)) {
                 attachments.push({
-                    content: fs.readFileSync(filePath).toString("base64"),
                     filename: "Evidence-Audio.webm",
-                    type: "audio/webm",
-                    disposition: "attachment"
+                    content: fs.readFileSync(filePath),
+                    contentType: "audio/webm",
                 });
             }
         } catch (err) {
@@ -40,8 +45,7 @@ export const sendEmergencyNotifications = async (user, alertData) => {
         }
     }
 
-    // 2. CREATE THE RED VIDEO BUTTON (The Visual Part)
-    // We check if 'videoLink' exists. If yes, we add HTML for a red button.
+    // 2. CREATE THE RED VIDEO BUTTON
     const videoSection = alertData.videoLink ? `
         <div style="margin: 25px 0; text-align: center;">
             <a href="${alertData.videoLink}" 
@@ -81,18 +85,18 @@ export const sendEmergencyNotifications = async (user, alertData) => {
         if (contact.type !== "EMAIL") continue;
 
         const msg = {
+            from: `"Safety App 🚨" <${process.env.EMAIL_USER}>`,
             to: contact.value,
-            from: process.env.EMAIL_USER,
             subject: `🚨 SOS ALERT: ${user.username} needs help!`,
             html: htmlBody,
-            attachments: attachments
+            attachments: attachments,
         };
 
         try {
-            await sgMail.send(msg);
+            await transporter.sendMail(msg);
             console.log(`✅ [EMAIL SENT] To ${contact.name}`);
         } catch (error) {
-            console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error.response ? error.response.body : error.message);
+            console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error.message);
         }
     }
 };
