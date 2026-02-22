@@ -1,5 +1,5 @@
 // File: server/utils/notificationService.js
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import fs from "fs";
 import dotenv from 'dotenv';
 
@@ -7,19 +7,12 @@ dotenv.config();
 
 export const sendEmergencyNotifications = async (user, alertData) => {
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("❌ CRITICAL ERROR: Gmail config missing. Add EMAIL_USER and EMAIL_PASS to .env");
+    if (!process.env.RESEND_API_KEY || !process.env.EMAIL_USER) {
+        console.error("❌ CRITICAL ERROR: Resend config missing. Add RESEND_API_KEY and EMAIL_USER to .env");
         return;
     }
 
-    // Create Gmail transporter
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Use Gmail App Password (16-char)
-        },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     console.log(`\n--- 🚨 SENDING ALERT FOR: ${user.username} ---`);
 
@@ -84,17 +77,23 @@ export const sendEmergencyNotifications = async (user, alertData) => {
     for (const contact of user.contacts) {
         if (contact.type !== "EMAIL") continue;
 
-        const msg = {
-            from: `"Safety App 🚨" <${process.env.EMAIL_USER}>`,
-            to: contact.value,
-            subject: `🚨 SOS ALERT: ${user.username} needs help!`,
-            html: htmlBody,
-            attachments: attachments,
-        };
-
         try {
-            await transporter.sendMail(msg);
-            console.log(`✅ [EMAIL SENT] To ${contact.name}`);
+            const { data, error } = await resend.emails.send({
+                from: "Safety App <onboarding@resend.dev>",
+                to: [contact.value],
+                subject: `🚨 SOS ALERT: ${user.username} needs help!`,
+                html: htmlBody,
+                attachments: attachments.map(a => ({
+                    filename: a.filename,
+                    content: a.content,
+                })),
+            });
+
+            if (error) {
+                console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error);
+            } else {
+                console.log(`✅ [EMAIL SENT] To ${contact.name} | ID: ${data.id}`);
+            }
         } catch (error) {
             console.error(`❌ [EMAIL FAILED] To ${contact.name}:`, error.message);
         }
