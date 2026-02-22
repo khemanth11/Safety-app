@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 
 const FallDetector = ({ onTrigger }) => {
     const [countdown, setCountdown] = useState(null); // Null = No Fall Detected
+    // eslint-disable-next-line no-unused-vars
     const [listening, setListening] = useState(false);
 
     // THRESHOLD: How hard the impact must be (25 is a hard shake/drop)
-    const IMPACT_THRESHOLD = 25; 
+    const IMPACT_THRESHOLD = 25;
 
     useEffect(() => {
         // Check if sensor is available
@@ -30,7 +31,7 @@ const FallDetector = ({ onTrigger }) => {
             timer = setTimeout(() => setCountdown(countdown - 1), 1000);
         } else if (countdown === 0) {
             // TIME'S UP! TRIGGER SOS!
-            onTrigger(); 
+            onTrigger();
             setCountdown(null); // Reset
         }
         return () => clearTimeout(timer);

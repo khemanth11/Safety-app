@@ -28,9 +28,10 @@ export const sendEmergencyNotifications = async (user, alertData) => {
             const filePath = `.${alertData.audioUrl}`;
             if (fs.existsSync(filePath)) {
                 attachments.push({
+                    content: fs.readFileSync(filePath).toString("base64"),
                     filename: "Evidence-Audio.webm",
-                    content: fs.readFileSync(filePath),
-                    contentType: "audio/webm",
+                    type: "audio/webm",
+                    disposition: "attachment"
                 });
             }
         } catch (err) {
