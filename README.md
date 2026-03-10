@@ -1,8 +1,12 @@
-# Safety App 🛡️
+# Safety App 🛡️ (Disguised as a Calculator)
 
-A comprehensive personal safety application featuring real-time location tracking, voice-activated SOS alerts, and emergency contact notifications. Built with a React/Capacitor mobile client and a Node.js/Express backend.
+A comprehensive personal safety application ingeniously disguised as a fully functional calculator. Behind the calculator interface lies a powerful safety toolkit featuring real-time location tracking, voice-activated SOS alerts, and emergency contact notifications. Built with a React/Capacitor mobile client and a Node.js/Express backend.
+
+🌐 **Live Demo:** [https://safety-app-xi.vercel.app/](https://safety-app-xi.vercel.app/)
 
 ## 🚀 Features
+
+- **Stealth Mode (Calculator UI):** Appears and functions as a standard calculator to avoid arousing suspicion in dangerous situations. The safety features are hidden behind a secret PIN or interaction.
 
 - **Voice-Activated SOS:** Utilizes TensorFlow.js Speech Commands to trigger alerts hands-free (e.g., detecting "help" or specific keywords).
 - **Real-Time Location Tracking:** Powered by Socket.IO for live location sharing with emergency contacts.
