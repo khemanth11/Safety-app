@@ -17,7 +17,10 @@ const Dashboard = () => {
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userId = userInfo ? userInfo._id : 'unknown';
-  const watchLink = `${window.location.origin}/watch/${userId}`;
+  
+  // Use custom base URL if configured (e.g., for local IP testing), otherwise use current origin
+  const baseUrl = process.env.REACT_APP_BASE_URL || window.location.origin;
+  const watchLink = `${baseUrl}/watch/${userId}`;
 
   // --- SENTINEL AI TRIGGER LISTENER ---
   useEffect(() => {

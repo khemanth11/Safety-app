@@ -1,86 +1,110 @@
-# Safety App 🛡️ (Disguised as a Calculator)
+# 🛡️ GHOST PROTOCOL: Premium Personal Safety Suite
+> **Personal Security, Reimagined.** *Investment-Grade Stealth & Protection.*
 
-A comprehensive personal safety application ingeniously disguised as a fully functional calculator. Behind the calculator interface lies a powerful safety toolkit featuring real-time location tracking, voice-activated SOS alerts, and emergency contact notifications. Built with a React/Capacitor mobile client and a Node.js/Express backend.
+[![Version](https://img.shields.io/badge/Version-2.1.0-4F46E5.svg)](https://github.com/Hemanth1234554/Safety-app)
+[![License: ISC](https://img.shields.io/badge/License-ISC-00D1FF.svg)](https://opensource.org/licenses/ISC)
+[![Framework: React](https://img.shields.io/badge/Framework-React-blue.svg)](https://reactjs.org/)
 
-🌐 **Live Demo:** [https://safety-app-xi.vercel.app/](https://safety-app-xi.vercel.app/)
+**Ghost Protocol** is a state-of-the-art personal safety application engineered for the modern "Security Professional" aesthetic. Disguised as a high-fidelity calculator, it encapsulates a powerful tactical suite designed to provide immediate protection, silent alerts, and real-time surveillance during critical situations.
 
-## 🚀 Features
+🌐 **Live Secure Link:** [https://safety-app-xi.vercel.app/](https://safety-app-xi.vercel.app/)
 
-- **Stealth Mode (Calculator UI):** Appears and functions as a standard calculator to avoid arousing suspicion in dangerous situations. The safety features are hidden behind a secret PIN or interaction.
+---
 
-- **Voice-Activated SOS:** Utilizes TensorFlow.js Speech Commands to trigger alerts hands-free (e.g., detecting "help" or specific keywords).
-- **Real-Time Location Tracking:** Powered by Socket.IO for live location sharing with emergency contacts.
-- **Automated Alerts:** Instant email notifications via SendGrid and Nodemailer when an emergency is triggered.
-- **User Authentication:** Secure user registration, login, and token-based (JWT) authentication.
-- **Mobile-Ready:** Built with web technologies (React) and packaged as a native mobile application using Capacitor.
+## ✨ The Tactical Suite
 
-## 🛠️ Tech Stack
+### 🕵️‍♂️ Stealth Disguise (Calculator Core)
+A pixel-perfect, fully functional calculator interface that serves as the "disguise layer." Strategic PIN entry triggers the transition from utility to security.
 
-### Frontend (Client)
-- **Framework:** [React](https://reactjs.org/)
-- **Mobile Packaging:** [Capacitor](https://capacitorjs.com/)
-- **AI/Machine Learning:** [TensorFlow.js](https://www.tensorflow.org/js) (`@tensorflow-models/speech-commands`)
-- **Real-Time Communication:** [Socket.IO Client](https://socket.io/)
-- **HTTP/API Client:** [Axios](https://axios-http.com/)
+### 🤖 Sentinel AI (Voice Trigger)
+Utilizes **TensorFlow.js** for real-time auditory pattern recognition. Programmed to detect emergency keywords (e.g., "STOP") even when the phone is not in active use, automatically triggering silent SOS alerts.
 
-### Backend (Server)
-- **Runtime Environment:** [Node.js](https://nodejs.org/)
-- **API Framework:** [Express.js](https://expressjs.com/)
-- **Database:** [MongoDB](https://www.mongodb.com/) (with Mongoose)
-- **Real-Time Communication:** [Socket.IO](https://socket.io/)
-- **Email Delivery:** [Nodemailer](https://nodemailer.com/), [SendGrid](https://sendgrid.com/)
-- **Security & Auth:** [JWT](https://jwt.io/), bcryptjs
+### 👁️ Ghost Eye (Live Broadcast)
+High-performance P2P video streaming using **WebRTC** and **Socket.io**. Instantly broadcast live encrypted feeds from your device to your trusted network.
 
-## 📦 Getting Started
+### 📍 Tactical Dashboard
+A glassmorphism-based "Command Center" featuring:
+- **Premium SOS Button**: Immediate silent or loud alert trigger with haptic feedback.
+- **Real-Time Telemetry**: Live GPS tracking and system status monitoring.
+- **Identity Settings**: Encrypted emergency contact management with quick-add functionality.
+
+### 📞 Phantom Call (Extraction Strategy)
+A high-fidelity modern smartphone call simulation. Allows for a professional "exit strategy" from uncomfortable or dangerous social situations with a single tap.
+
+---
+
+## 🛰️ Tactical Local Testing (Cross-Device)
+To test the "Ghost Eye" live stream and location alerts on multiple devices (Mobile + PC) simultaneously while running locally:
+
+1. **Find your Local IP**: Run `ipconfig` (Windows) or `ifconfig` (Mac/Linux) to find your IPv4 address (e.g., `192.168.1.5`).
+2. **Configure Client**: Create a `.env` file in the `client` directory:
+   ```env
+   REACT_APP_BASE_URL=http://your_local_ip:3000
+   ```
+3. **Connectivity**: Ensure all devices are on the **same Wi-Fi network**.
+4. **Access**: Open the app on your mobile browser using `http://your_local_ip:3000`. 
+5. **Live Tunneling**: For external testing without Wi-Fi parity, we recommend [ngrok](https://ngrok.com/): `ngrok http 3000`.
+
+---
+
+## 🎨 Engineering Stack
+
+### Frontend Architecture
+- **Engine:** [React.js](https://reactjs.org/) with Hooks & Functional Components.
+- **Design System:** Custom **"Ghost Protocol"** CSS Framework (Glassmorphism, CSS Variables, Inter Typography).
+- **Communication:** [Socket.IO Client](https://socket.io/) & [WebRTC](https://webrtc.org/).
+- **Intelligence:** [@tensorflow/tfjs-models/speech-commands](https://www.tensorflow.org/js).
+- **Mobile Layer:** [Capacitor](https://capacitorjs.com/) (Native Android/iOS packaging).
+
+### Backend Infrastructure
+- **Runtime:** [Node.js](https://nodejs.org/) & [Express.js](https://express.js.com/).
+- **Database:** [MongoDB](https://www.mongodb.com/) (Mongoose ODM).
+- **Security:** [JWT](https://jwt.io/) (Stateless Authentication) & Bcrypt (Password Hashing).
+- **Messaging:** [Nodemailer](https://nodemailer.com/).
+
+---
+
+## 🚀 Deployment & Operations
 
 ### Prerequisites
-- Node.js (v18+)
-- MongoDB instance (local server or MongoDB Atlas)
+- Node.js v18.x+
+- MongoDB instance (Local or Atlas)
+- Secure Network for WebRTC (STUN/TURN)
 
-### 1. Clone the repository
+### 1. Repository Initialization
 ```bash
 git clone https://github.com/Hemanth1234554/Safety-app.git
 cd safety-app
 ```
 
-### 2. Backend Setup
-Navigate into the `server` directory and install dependencies:
+### 2. Backend Orchestration
+Configure your `.env` in the `server` directory and ignite the core:
 ```bash
 cd server
 npm install
-```
-Create a `.env` file in the `server` directory and add the following variables:
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-SENDGRID_API_KEY=your_sendgrid_api_key
-```
-Start the development server:
-```bash
 npm run dev
 ```
 
-### 3. Frontend Setup
-Open a new terminal, navigate to the `client` directory, and install dependencies:
+### 3. Frontend Activation
 ```bash
 cd client
 npm install
-```
-Start the React development server:
-```bash
 npm start
 ```
-The client app should now fall back to the live server or `localhost` depending on your active `.env` configuration.
 
-## 📱 Mobile Build
-To build the Android app via Capacitor, run the following commands from inside the `client` folder:
+### 📱 Mobile Synchronization (Capacitor)
+Deploy to Android/iOS with native performance:
 ```bash
 npm run build
-npx cap sync android
+npx cap sync
 npx cap open android
 ```
-*(Requires Android Studio installed).*
 
-## 📄 License
-This project is licensed under the ISC License.
+---
+
+## 📄 Corporate Intelligence
+- **Developer:** [Hemanth](https://github.com/Hemanth1234554)
+- **Status:** Production Ready (v2.1)
+- **Design Benchmark:** Professional Tier / Investment Quality
+
+*Protected under GHOST PROTOCOL Security Standards.*
