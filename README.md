@@ -93,6 +93,9 @@ npm start
 ```
 
 ### 📱 Mobile Synchronization (Capacitor)
+> [!IMPORTANT]
+> **New Build Required**: Because we have completely overhauled the UI, you **MUST** run a fresh build to synchronize the assets and avoid 404 errors.
+
 Deploy to Android/iOS with native performance:
 ```bash
 npm run build
