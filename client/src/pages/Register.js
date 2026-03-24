@@ -8,6 +8,7 @@ const Register = () => {
     username: '', email: '', password: '', safePin: '', panicPin: '', adminPin: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,42 +17,88 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
       const { data } = await axios.post('https://ghost-backend-fq2h.onrender.com/api/auth/register', formData);
       localStorage.setItem('userInfo', JSON.stringify(data));
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'REGISTRATION FAILED');
+      setError(err.response?.data?.message || 'REGISTRATION FAILED: Please check your details.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <h2>📝 NEW AGENT SETUP</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="auth-container glass-panel" style={{ maxWidth: '480px' }}>
+      <h2 style={{ marginBottom: '24px' }}>SECURE ENROLLMENT</h2>
+      
+      {error && (
+        <div style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          color: 'var(--danger)', 
+          padding: '12px', 
+          borderRadius: '8px',
+          fontSize: '0.9rem',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          marginBottom: '20px' 
+        }}>
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleRegister}>
-        <input className="spy-input" name="username" placeholder="CODENAME (USERNAME)" onChange={handleChange} required />
-        <input className="spy-input" name="email" type="email" placeholder="EMAIL" onChange={handleChange} required />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <input className="spy-input" name="username" placeholder="CODENAME" onChange={handleChange} required />
+          <input className="spy-input" name="email" type="email" placeholder="EMAIL" onChange={handleChange} required />
+        </div>
         <input className="spy-input" name="password" type="password" placeholder="PASSWORD" onChange={handleChange} required />
 
-        <div style={{ margin: '20px 0', border: '1px dashed #333', padding: '15px', borderRadius: '10px' }}>
-          <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#0088ff' }}></p>
-          <input className="spy-input" name="safePin" placeholder="SAFE PIN (e.g. 1234)" onChange={handleChange} required />
-          <input className="spy-input" name="panicPin" placeholder="PANIC PIN (e.g. 9999)" onChange={handleChange} required />
-          <input className="spy-input" name="adminPin" placeholder="ADMIN PIN (e.g. 5555)" onChange={handleChange} required />
+        <div style={{ 
+          margin: '24px 0', 
+          background: 'rgba(255, 255, 255, 0.03)', 
+          padding: '20px', 
+          borderRadius: '16px',
+          border: '1px solid var(--glass-border)'
+        }}>
+          <p style={{ margin: '0 0 16px 0', fontSize: '0.8rem', color: 'var(--primary)', fontWeight: '600', textAlign: 'left' }}>
+            SECURITY ACCESS CODES
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <div style={{ textAlign: 'left' }}>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginLeft: '4px' }}>SAFE</label>
+              <input className="spy-input" name="safePin" placeholder="1234" onChange={handleChange} required />
+            </div>
+            <div style={{ textAlign: 'left' }}>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginLeft: '4px' }}>PANIC</label>
+              <input className="spy-input" name="panicPin" placeholder="9999" onChange={handleChange} required />
+            </div>
+            <div style={{ textAlign: 'left' }}>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginLeft: '4px' }}>ADMIN</label>
+              <input className="spy-input" name="adminPin" placeholder="5555" onChange={handleChange} required />
+            </div>
+          </div>
         </div>
 
-        <button type="submit" className="spy-btn btn-secondary">
-          INITIALIZE PROFILE
+        <button 
+          type="submit" 
+          className="spy-btn btn-primary"
+          disabled={loading}
+        >
+          {loading ? 'INITIALIZING...' : 'INITIALIZE PROFILE'}
         </button>
       </form>
 
-      <p className="link-text" onClick={() => navigate('/login')}>
-        ALREADY AN AGENT? LOGIN
-      </p>
+      <button 
+        className="spy-btn btn-secondary" 
+        onClick={() => navigate('/login')}
+        style={{ marginTop: '16px' }}
+      >
+        ALREADY ENROLLED? LOGIN
+      </button>
     </div>
   );
 };
 
-export default Register;
+export default Register;

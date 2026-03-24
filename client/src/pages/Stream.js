@@ -12,7 +12,6 @@ const Stream = () => {
     const navigate = useNavigate();
 
     const addLog = (msg) => {
-        console.log(msg);
         setLogs(prev => [`${new Date().toLocaleTimeString().split(' ')[0]} ${msg}`, ...prev].slice(0, 10));
     };
 
@@ -22,54 +21,7 @@ const Stream = () => {
         if (userInfo && userInfo._id) userId = userInfo._id;
     } catch (e) {}
 
-    useEffect(() => {
-        const init = async () => {
-            addLog(`🚀 APP STARTED. ID: ${userId}`);
-
-            try {
-                addLog("🔌 Connecting to Server...");
-                const socket = io('https://ghost-backend-fq2h.onrender.com');
-                socketRef.current = socket;
-
-                socket.on('connect', () => {
-                    setStatus("✅ SERVER CONNECTED");
-                    addLog(`✅ Connected! Socket ID: ${socket.id}`);
-                    socket.emit("join_room", userId);
-                });
-
-                socket.on("user_joined", (viewerId) => {
-                    setStatus("🔴 VIEWER JOINED - STARTING STREAM");
-                    addLog(`👤 Viewer Detected: ${viewerId}`);
-                    startCall(socket, userId);
-                });
-
-                socket.on("answer", () => addLog("🤝 Answer Received"));
-            } catch (err) {
-                setStatus("❌ SOCKET ERROR");
-                addLog(`Socket Failed: ${err.message}`);
-            }
-
-            try {
-                addLog("📷 Requesting Camera...");
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 640, height: 640 },
-                    audio: true
-                });
-                streamRef.current = stream;
-                if (userVideo.current) userVideo.current.srcObject = stream;
-                addLog("✅ Camera Active");
-            } catch (err) {
-                setStatus("❌ CAMERA DENIED");
-                alert("Allow camera permissions");
-            }
-        };
-
-        init();
-        return () => socketRef.current && socketRef.current.disconnect();
-        // eslint-disable-next-line
-    }, []);
-
-    const startCall = async (socket, roomId) => {
+    const startCall = React.useCallback(async (socket, roomId) => {
         addLog("🚀 Starting P2P Handshake...");
         try {
             const pc = new RTCPeerConnection({
@@ -98,138 +50,153 @@ const Stream = () => {
         } catch (err) {
             addLog(`❌ P2P Error: ${err.message}`);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            addLog(`🚀 APP STARTED. ID: ${userId}`);
+
+            try {
+                addLog("🔌 Connecting to Server...");
+                const socket = io('https://ghost-backend-fq2h.onrender.com');
+                socketRef.current = socket;
+
+                socket.on('connect', () => {
+                    setStatus("CONNECTED");
+                    addLog(`✅ Connected! Socket ID: ${socket.id}`);
+                    socket.emit("join_room", userId);
+                });
+
+                socket.on("user_joined", (viewerId) => {
+                    setStatus("BROADCASTING");
+                    addLog(`👤 Viewer Detected: ${viewerId}`);
+                    startCall(socket, userId);
+                });
+
+                socket.on("answer", () => addLog("🤝 Answer Received"));
+            } catch (err) {
+                setStatus("SOCKET ERROR");
+                addLog(`Socket Failed: ${err.message}`);
+            }
+
+            try {
+                addLog("📷 Requesting Camera...");
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 640 },
+                    audio: true
+                });
+                streamRef.current = stream;
+                if (userVideo.current) userVideo.current.srcObject = stream;
+                addLog("✅ Camera Active");
+            } catch (err) {
+                setStatus("CAMERA DENIED");
+                alert("Allow camera permissions");
+            }
+        };
+
+        init();
+        return () => socketRef.current && socketRef.current.disconnect();
+    }, [userId, startCall]);
 
     return (
-        <div style={styles.page}>
-            <div style={styles.container}>
-                <div style={styles.left}>
-                    <div style={styles.header}>LIVE BROADCAST</div>
-                    <div style={styles.sub}>ID: {userId}</div>
+        <div style={{ minHeight: '100vh', padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', paddingTop: '40px' }}>
+                <div style={{ flex: '1.5', minWidth: '320px' }}>
+                    <div className="glass-panel" style={{ padding: '24px', paddingBottom: '32px' }}>
+                        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <div>
+                                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>GHOST EYE</h1>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>ID: {userId}</p>
+                            </div>
+                            <div style={{ 
+                                padding: '6px 12px', 
+                                background: status === 'BROADCASTING' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)',
+                                color: status === 'BROADCASTING' ? 'var(--danger)' : 'var(--text-dim)',
+                                borderRadius: '8px',
+                                fontSize: '0.8rem',
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                {status === 'BROADCASTING' && <span style={{ width: '8px', height: '8px', background: 'var(--danger)', borderRadius: '50%' }}></span>}
+                                {status}
+                            </div>
+                        </header>
 
-                    <video
-                        ref={userVideo}
-                        autoPlay
-                        playsInline
-                        muted
-                        style={styles.video}
-                    />
+                        <div style={{ 
+                            width: '100%', 
+                            aspectRatio: '1', 
+                            background: '#000', 
+                            borderRadius: '16px', 
+                            overflow: 'hidden',
+                            border: '1px solid var(--glass-border)',
+                            boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+                            position: 'relative'
+                        }}>
+                            <video
+                                ref={userVideo}
+                                autoPlay
+                                playsInline
+                                muted
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            {status === 'BROADCASTING' && (
+                                <div style={{ 
+                                    position: 'absolute', 
+                                    top: '16px', 
+                                    left: '16px', 
+                                    background: 'var(--danger)', 
+                                    color: 'white', 
+                                    fontSize: '0.7rem', 
+                                    fontWeight: '800', 
+                                    padding: '4px 8px', 
+                                    borderRadius: '4px' 
+                                }}>
+                                    LIVE
+                                </div>
+                            )}
+                        </div>
 
-                    <div style={styles.status}>{status}</div>
-
-                    <button onClick={() => navigate('/dashboard')} style={styles.stopBtn}>
-                        STOP STREAM
-                    </button>
+                        <button 
+                            onClick={() => navigate('/dashboard')} 
+                            className="spy-btn btn-danger"
+                            style={{ marginTop: '24px' }}
+                        >
+                            TERMINATE BROADCAST
+                        </button>
+                    </div>
                 </div>
 
-                <div style={styles.right}>
-                    <div style={styles.logHeader}>SYSTEM LOGS</div>
-                    <div style={styles.logBox}>
-                        {logs.length === 0
-                            ? <div style={{ opacity: 0.5 }}>Waiting for events...</div>
-                            : logs.map((l, i) => <div key={i}>{l}</div>)
-                        }
+                <div style={{ flex: '1', minWidth: '300px' }}>
+                    <div className="glass-panel" style={{ height: '100%', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+                        <h2 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--primary)' }}>SYSTEM TELEMETRY</h2>
+                        <div style={{ 
+                            flex: 1, 
+                            background: 'rgba(0,0,0,0.3)', 
+                            borderRadius: '12px', 
+                            padding: '16px',
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                            color: 'var(--text-dim)',
+                            overflowY: 'auto',
+                            maxHeight: '400px'
+                        }}>
+                            {logs.length === 0 ? (
+                                <div style={{ opacity: 0.5 }}>Waiting for system logs...</div>
+                            ) : (
+                                logs.map((l, i) => (
+                                    <div key={i} style={{ marginBottom: '8px', borderLeft: '2px solid rgba(255,255,255,0.1)', paddingLeft: '8px' }}>
+                                        {l}
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
-};
-
-const styles = {
-    page: {
-        minHeight: '100vh',
-        background: '#0b0b0b',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: '#fff',
-        fontFamily: 'system-ui'
-    },
-
-    container: {
-        width: '100%',
-        maxWidth: '1100px',
-        display: 'flex',
-        gap: '20px',
-        padding: '15px',
-        flexWrap: 'wrap'
-    },
-
-    left: {
-        flex: 1,
-        minWidth: '280px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '12px'
-    },
-
-    right: {
-        flex: 1,
-        minWidth: '280px',
-        background: '#111',
-        borderRadius: '12px',
-        padding: '12px',
-        display: 'flex',
-        flexDirection: 'column'
-    },
-
-    header: {
-        fontSize: '20px',
-        fontWeight: '700',
-        color: '#ff2d2d'
-    },
-
-    sub: {
-        fontSize: '12px',
-        opacity: 0.7
-    },
-
-    video: {
-        width: '100%',
-        maxWidth: '420px',
-        aspectRatio: '1 / 1',
-        borderRadius: '16px',
-        background: '#000',
-        border: '2px solid #ff2d2d',
-        objectFit: 'cover'
-    },
-
-    status: {
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#00ff88'
-    },
-
-    stopBtn: {
-        padding: '12px',
-        width: '100%',
-        maxWidth: '300px',
-        background: '#ff2d2d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '10px',
-        fontWeight: '700',
-        cursor: 'pointer'
-    },
-
-    logHeader: {
-        fontSize: '14px',
-        marginBottom: '8px',
-        fontWeight: '600',
-        color: '#00ff88'
-    },
-
-    logBox: {
-        flex: 1,
-        background: '#000',
-        borderRadius: '10px',
-        padding: '10px',
-        fontSize: '12px',
-        color: '#00ff00',
-        overflowY: 'auto'
-    }
 };
 
 export default Stream;

@@ -1,13 +1,59 @@
-body {
+:root {
+  /* --- Professional Color Palette --- */
+  --bg-deep: #0A0B14;
+  --bg-surface: rgba(26, 27, 38, 0.7);
+  --primary: #4F46E5; /* Indigo */
+  --primary-glow: rgba(79, 70, 229, 0.4);
+  --accent: #00D1FF; /* Cyan accent */
+  --text-main: #FFFFFF;
+  --text-dim: #D1D5DB; /* Brighter gray for better visibility */
+  --danger: #EF4444;
+  --success: #10B981;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  
+  /* --- Typography --- */
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  min-height: 100dvh;
+  /* Smooth backdrop for the whole app */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(0, 209, 255, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+button, input {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2D2E3F;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

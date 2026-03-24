@@ -13,20 +13,18 @@ const Settings = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     const userId = userInfo ? userInfo._id : null;
 
-    useEffect(() => {
-        if (userId) fetchContacts();
-        // eslint-disable-next-line
-    }, [userId]);
-
-    const fetchContacts = async () => {
+    const fetchContacts = React.useCallback(async () => {
         try {
-            // Updated to point to Render
             const res = await axios.get(`https://ghost-backend-fq2h.onrender.com/api/users/contacts?userId=${userId}`);
             setContacts(res.data);
         } catch (error) {
             console.error("Fetch error:", error);
         }
-    };
+    }, [userId]);
+
+    useEffect(() => {
+        if (userId) fetchContacts();
+    }, [userId, fetchContacts]);
 
     const handleAdd = async (e) => {
         e.preventDefault();
@@ -36,7 +34,7 @@ const Settings = () => {
             const res = await axios.post('https://ghost-backend-fq2h.onrender.com/api/users/contacts', {
                 userId,
                 name,
-                phone // Assuming SMS type for now
+                phone
             });
             setContacts(res.data);
             setName('');
@@ -47,16 +45,14 @@ const Settings = () => {
         setLoading(false);
     };
 
-    // <--- THIS IS THE DELETE FUNCTION YOU WANTED
     const handleDelete = async (contactId) => {
         if(!window.confirm("Delete this contact?")) return;
 
         try {
-            // Note: In DELETE requests, body data goes inside the 'data' property
             const res = await axios.delete(`https://ghost-backend-fq2h.onrender.com/api/users/contacts/${contactId}`, {
                 data: { userId } 
             });
-            setContacts(res.data); // Update list with the fresh data from server
+            setContacts(res.data);
         } catch (error) {
             console.error("Delete failed:", error);
             alert("Could not delete contact.");
@@ -64,67 +60,100 @@ const Settings = () => {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>SETTINGS & CONTACTS</div>
+        <div style={{ minHeight: '100vh', padding: '40px 20px', maxWidth: '800px', margin: '0 auto' }}>
+            <header style={{ marginBottom: '48px', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>IDENTITY SETTINGS</h1>
+                <p style={{ color: 'var(--text-dim)', letterSpacing: '0.1em' }}>MANAGE SECURITY CONTACTS</p>
+            </header>
             
-            {/* ADD CONTACT FORM */}
-            <form onSubmit={handleAdd} style={styles.form}>
-                <input 
-                    type="text" 
-                    placeholder="Name (e.g., Mom)" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    style={styles.input}
-                />
-                <input 
-                    type="tel" 
-                    placeholder="Phone / Email" 
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    style={styles.input}
-                />
-                <button type="submit" disabled={loading} style={styles.addBtn}>
-                    {loading ? "SAVING..." : "ADD CONTACT"}
-                </button>
-            </form>
-
-            {/* CONTACT LIST */}
-            <div style={styles.list}>
-                {contacts.map((c) => (
-                    <div key={c._id} style={styles.card}>
-                        <div style={styles.info}>
-                            <div style={styles.name}>{c.name}</div>
-                            <div style={styles.detail}>{c.value}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
+                {/* ADD CONTACT FORM */}
+                <div className="glass-panel" style={{ padding: '24px' }}>
+                    <h2 style={{ fontSize: '1rem', marginBottom: '24px', color: 'var(--primary)' }}>ADD EMERGENCY CONTACT</h2>
+                    <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginLeft: '4px' }}>CONTACT NAME</label>
+                            <input 
+                                className="spy-input"
+                                type="text" 
+                                placeholder="e.g. Guardian" 
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
                         </div>
-                        {/* THE DELETE BUTTON (Red Cross) */}
-                        <button onClick={() => handleDelete(c._id)} style={styles.deleteBtn}>
-                            ❌
+                        <div>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginLeft: '4px' }}>PHONE / SECURE ID</label>
+                            <input 
+                                className="spy-input"
+                                type="tel" 
+                                placeholder="+1 (555) 000-0000" 
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                            />
+                        </div>
+                        <button type="submit" disabled={loading} className="spy-btn btn-primary" style={{ marginTop: '12px' }}>
+                            {loading ? "SAVING..." : "AUTHORIZE CONTACT"}
                         </button>
+                    </form>
+                </div>
+
+                {/* CONTACT LIST */}
+                <div className="glass-panel" style={{ padding: '24px' }}>
+                    <h2 style={{ fontSize: '1rem', marginBottom: '24px', color: 'var(--primary)' }}>SECURE CONTACT LIST</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {contacts.map((c) => (
+                            <div key={c._id} className="glass-panel" style={{ 
+                                background: 'rgba(255,255,255,0.03)', 
+                                padding: '16px', 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                borderRadius: '12px'
+                            }}>
+                                <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontWeight: '700', fontSize: '0.95rem' }}>{c.name}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '2px' }}>{c.phone || c.value}</div>
+                                </div>
+                                <button 
+                                    onClick={() => handleDelete(c._id)} 
+                                    style={{ 
+                                        background: 'rgba(239, 68, 68, 0.1)', 
+                                        border: 'none', 
+                                        color: 'var(--danger)', 
+                                        width: '32px', 
+                                        height: '32px', 
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                        {contacts.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '40px 0', opacity: 0.5 }}>
+                                <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📡</div>
+                                <p style={{ fontSize: '0.8rem' }}>No secure contacts found.</p>
+                            </div>
+                        )}
                     </div>
-                ))}
-                {contacts.length === 0 && <p style={{color:'#666', marginTop: '20px'}}>No contacts yet.</p>}
+                </div>
             </div>
 
-            <button onClick={() => navigate('/dashboard')} style={styles.backBtn}>
-                BACK TO DASHBOARD
-            </button>
+            <div style={{ textAlign: 'center', marginTop: '48px' }}>
+                <button 
+                  onClick={() => navigate('/dashboard')} 
+                  className="spy-btn btn-secondary"
+                  style={{ maxWidth: '240px', margin: '0 auto' }}
+                >
+                    BACK TO CONTROL CENTER
+                </button>
+            </div>
         </div>
     );
-};
-
-const styles = {
-    container: { minHeight: '100vh', background: '#000', color: '#fff', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-    header: { color: '#00ff00', fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', letterSpacing: '2px' },
-    form: { width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' },
-    input: { padding: '15px', borderRadius: '5px', border: '1px solid #333', background: '#111', color: '#fff', fontSize: '16px' },
-    addBtn: { padding: '15px', background: '#0088ff', color: '#fff', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' },
-    list: { width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '10px' },
-    card: { background: '#111', padding: '15px', borderRadius: '8px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    info: { display: 'flex', flexDirection: 'column', textAlign: 'left' },
-    name: { fontSize: '16px', fontWeight: 'bold', color: '#fff' },
-    detail: { fontSize: '12px', color: '#888' },
-    deleteBtn: { background: 'transparent', border: 'none', fontSize: '14px', cursor: 'pointer', padding: '5px 10px' },
-    backBtn: { marginTop: '30px', background: '#333', color: '#fff', padding: '10px 20px', borderRadius: '5px', border: 'none' }
 };
 
 export default Settings;

@@ -148,35 +148,105 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      {/* SENSORS & MODES */}
       <FallDetector onTrigger={() => handlePanic('CRASH_DETECTED')} />
       <DeadMode active={isDeadMode} onExit={() => setIsDeadMode(false)} />
 
       <div className="header-section">
-        <h2>Safe Zone</h2>
-        <p>GHOST PROTOCOL: <span style={{ color: '#32d74b' }}>ACTIVE</span></p>
-        <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>🔋 {batteryLevel}% BATTERY</div>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '32px' 
+        }}>
+          <div className="status-bar" style={{ margin: 0 }}>
+            <span style={{ marginRight: '8px' }}>●</span> {status}
+          </div>
+          <div style={{ 
+            fontSize: '0.8rem', 
+            fontWeight: '600',
+            color: batteryLevel < 20 ? 'var(--danger)' : 'var(--text-dim)',
+            background: 'rgba(255,255,255,0.05)',
+            padding: '6px 12px',
+            borderRadius: '8px'
+          }}>
+            🔋 {batteryLevel}%
+          </div>
+        </div>
+        
+        <h1 style={{ fontSize: '1.75rem' }}>Control Center</h1>
+        <p>Welcome back, Agent {userInfo?.username || 'User'}</p>
       </div>
 
       <div className="panic-container">
-        <button className="panic-btn" onClick={() => handlePanic('PANIC_BUTTON')} disabled={loading}>
+        <button 
+          className="panic-btn" 
+          onClick={() => handlePanic('PANIC_BUTTON')} 
+          disabled={loading}
+        >
           {loading ? '...' : 'SOS'}
         </button>
       </div>
 
-      <div className="status-bar">STATUS: {status}</div>
-
       <div className="tactical-menu">
-        <button className="spy-btn" onClick={() => navigate('/fake-call')}><span>📱</span> FAKE CALL</button>
-        <button className="spy-btn" onClick={() => navigate('/stream')} style={{ background: '#004400' }}>👁️ GHOST EYE (MANUAL)</button>
-        <button className="spy-btn" onClick={() => navigate('/sentinel')} style={{ background: '#4a0000' }}>🤖 SENTINEL AI</button>
-        
-        {/* NEW DEAD MODE BUTTON */}
-        <button className="spy-btn" onClick={() => setIsDeadMode(true)} style={{ background: '#000', border: '1px solid #333' }}>
-            🪦 DEAD MODE
+        <button className="spy-btn" onClick={() => navigate('/fake-call')}>
+          <span style={{ fontSize: '1.5rem' }}>📱</span>
+          <span>FAKE CALL</span>
         </button>
         
-        <button className="spy-btn danger" onClick={() => navigate('/settings')}><span>⚙️</span> SETTINGS</button>
+        <button 
+          className="spy-btn" 
+          onClick={() => navigate('/stream')} 
+          style={{ borderLeft: '4px solid var(--primary)' }}
+        >
+          <span style={{ fontSize: '1.5rem' }}>👁️</span>
+          <span>GHOST EYE</span>
+        </button>
+
+        <button 
+          className="spy-btn" 
+          onClick={() => navigate('/sentinel')} 
+          style={{ borderLeft: '4px solid var(--danger)' }}
+        >
+          <span style={{ fontSize: '1.5rem' }}>🤖</span>
+          <span>SENTINEL AI</span>
+        </button>
+        
+        <button 
+          className="spy-btn" 
+          onClick={() => setIsDeadMode(true)}
+        >
+          <span style={{ fontSize: '1.5rem' }}>🪦</span>
+          <span>DEAD MODE</span>
+        </button>
+        
+        <button 
+          className="spy-btn" 
+          onClick={() => navigate('/settings')}
+        >
+          <span style={{ fontSize: '1.5rem' }}>⚙️</span>
+          <span>SETTINGS</span>
+        </button>
+
+        <button 
+          className="spy-btn" 
+          onClick={() => {
+            localStorage.removeItem('userInfo');
+            navigate('/welcome');
+          }}
+          style={{ borderLeft: '4px solid #666' }}
+        >
+          <span style={{ fontSize: '1.5rem' }}>🚪</span>
+          <span>DISCONNECT</span>
+        </button>
+      </div>
+      
+      <div style={{ 
+        marginTop: '64px',
+        color: 'var(--text-dim)',
+        fontSize: '0.75rem',
+        opacity: 0.8
+      }}>
+        ENCRYPTED SESSION ID: {userId.substring(0, 8).toUpperCase()}
       </div>
     </div>
   );

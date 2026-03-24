@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 const Watch = () => {
     const { id } = useParams();
     const videoRef = useRef();
-    const [status, setStatus] = useState("SEARCHING FOR SIGNAL...");
+    const [status, setStatus] = useState("SEARCHING SIGNAL...");
     const [showPlayBtn, setShowPlayBtn] = useState(false);
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const Watch = () => {
 
         socket.on('connect', () => {
             socket.emit("join_room", id);
-            setStatus("CONNECTED. WAITING FOR VIDEO...");
+            setStatus("ESTABLISHING LINK...");
         });
 
         pc.ontrack = (event) => {
@@ -25,7 +25,7 @@ const Watch = () => {
                 videoRef.current.srcObject = event.streams[0];
                 videoRef.current.muted = true;
                 videoRef.current.play()
-                    .then(() => setStatus("🔴 LIVE FEED"))
+                    .then(() => setStatus("LIVE FEED"))
                     .catch(() => setShowPlayBtn(true));
             }
         };
@@ -56,107 +56,87 @@ const Watch = () => {
             videoRef.current.muted = false;
             videoRef.current.play();
             setShowPlayBtn(false);
-            setStatus("🟢 LIVE AUDIO & VIDEO");
+            setStatus("LIVE AUDIO/VIDEO");
         }
     };
 
     return (
-        <div style={styles.page}>
-            <div style={styles.container}>
-                <div style={styles.header}>LIVE MONITOR</div>
-                <div style={styles.subHeader}>STREAM ID: {id}</div>
+        <div style={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '20px' 
+        }}>
+            <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '32px', textAlign: 'center' }}>
+                <header style={{ marginBottom: '32px' }}>
+                    <h1 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>SURVEILLANCE MONITOR</h1>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', letterSpacing: '0.1em' }}>BROADCAST ID: {id}</p>
+                </header>
 
-                <div style={styles.videoWrapper}>
+                <div style={{ 
+                    width: '100%', 
+                    aspectRatio: '16/9', 
+                    background: '#000', 
+                    borderRadius: '20px', 
+                    overflow: 'hidden',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                    position: 'relative',
+                    marginBottom: '24px'
+                }}>
                     <video
                         ref={videoRef}
                         autoPlay
                         playsInline
                         muted
                         controls
-                        style={styles.video}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
+                    
+                    <div style={{ 
+                        position: 'absolute', 
+                        top: '20px', 
+                        left: '20px', 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '6px 12px',
+                        background: 'rgba(0,0,0,0.6)',
+                        backdropFilter: 'blur(4px)',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                        <span style={{ 
+                          width: '8px', 
+                          height: '8px', 
+                          background: status.includes('LIVE') ? 'var(--danger)' : 'var(--text-dim)', 
+                          borderRadius: '50%',
+                          animation: status.includes('LIVE') ? 'pulse-ring 2s infinite' : 'none'
+                        }}></span>
+                        <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'white' }}>{status}</span>
+                    </div>
                 </div>
 
-                <div style={styles.status}>{status}</div>
-
                 {showPlayBtn && (
-                    <button onClick={handlePlay} style={styles.playBtn}>
-                        🔊 TAP TO UNMUTE
+                    <button onClick={handlePlay} className="spy-btn btn-primary" style={{ maxWidth: '300px', margin: '0 auto 24px' }}>
+                        🔊 ENABLE AUDIO FEED
                     </button>
                 )}
+
+                <div style={{ 
+                    padding: '20px', 
+                    background: 'rgba(255,255,255,0.03)', 
+                    borderRadius: '12px',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-dim)',
+                    lineHeight: '1.6'
+                }}>
+                    <span style={{ color: 'var(--primary)', fontWeight: '700' }}>SECURITY NOTICE:</span> You are viewing an authorized emergency broadcast channel. All data is end-to-end encrypted under GHOST PROTOCOL v2.1.
+                </div>
             </div>
         </div>
     );
-};
-
-const styles = {
-    page: {
-        minHeight: '100vh',
-        background: '#0a0a0a',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: '#fff',
-        fontFamily: 'system-ui'
-    },
-
-    container: {
-        width: '100%',
-        maxWidth: '900px',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '12px'
-    },
-
-    header: {
-        fontSize: '22px',
-        fontWeight: '700',
-        color: '#00aaff'
-    },
-
-    subHeader: {
-        fontSize: '11px',
-        opacity: 0.6
-    },
-
-    videoWrapper: {
-        width: '100%',
-        maxWidth: '720px',
-        background: '#000',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        border: '2px solid #00aaff'
-    },
-
-    video: {
-        width: '100%',
-        height: 'auto',
-        display: 'block',
-        background: '#000'
-    },
-
-    status: {
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#00ff88',
-        marginTop: '4px'
-    },
-
-    playBtn: {
-        marginTop: '14px',
-        padding: '14px 28px',
-        background: '#00aaff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '12px',
-        fontSize: '16px',
-        fontWeight: '700',
-        cursor: 'pointer',
-        width: '100%',
-        maxWidth: '320px'
-    }
 };
 
 export default Watch;

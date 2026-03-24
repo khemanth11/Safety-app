@@ -12,7 +12,6 @@ const Sentinel = () => {
   const [listening, setListening] = useState(false);
   const recognizerRef = useRef(null);
   
-  // NEW: Store location here
   const locationRef = useRef({ latitude: 0, longitude: 0 });
 
   useEffect(() => {
@@ -26,15 +25,17 @@ const Sentinel = () => {
       recognizerRef.current = recognizer;
     };
     loadModel();
-    return () => recognizerRef.current?.stopListening();
+    return () => {
+      if (recognizerRef.current?.isListening()) {
+        recognizerRef.current.stopListening().catch(() => {});
+      }
+    };
   }, []);
 
-  // NEW: Get GPS immediately when user clicks "Start"
   const startListening = () => {
     if (!model) return;
     setListening(true);
 
-    // 1. PRE-FETCH GPS (User Gesture allows this)
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
             (pos) => {
@@ -42,14 +43,12 @@ const Sentinel = () => {
                     latitude: pos.coords.latitude,
                     longitude: pos.coords.longitude
                 };
-                console.log("Sentinel GPS Locked:", locationRef.current);
             },
             (err) => console.log("Sentinel GPS Error:", err),
             { enableHighAccuracy: true }
         );
     }
 
-    // 2. Start AI Listener
     model.listen(result => {
       const { scores } = result;
       const max = Math.max(...scores);
@@ -65,75 +64,106 @@ const Sentinel = () => {
     });
   };
 
-  const stopListening = () => {
+  const stopListening = async () => {
+    if (!model || !listening) return;
     setListening(false);
-    model?.stopListening();
+    try {
+      await model.stopListening();
+    } catch (err) {
+      console.log("Sentinel Stop Error:", err.message);
+    }
   };
 
-  const triggerPanic = () => {
-    stopListening();
-    // 3. PASS THE GPS DATA TO DASHBOARD
+  const triggerPanic = async () => {
+    await stopListening();
     navigate('/dashboard', { 
         state: { 
             autoSOS: true,
-            preLocation: locationRef.current // Passing the baton
+            preLocation: locationRef.current 
         } 
     });
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <header style={styles.header}>
-          <h1 style={styles.title}>Sentinel AI</h1>
-          <span style={{ ...styles.badge, background: model ? '#e6f4ea' : '#fff4e5', color: model ? '#137333' : '#b26a00' }}>
-            {model ? 'Online' : 'Loading...'}
-          </span>
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      padding: '20px' 
+    }}>
+      <div className="glass-panel" style={{ width: '100%', maxWidth: '520px', padding: '32px' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '1.75rem', margin: 0 }}>Sentinel AI</h1>
+          <div className="status-bar" style={{ 
+            margin: 0, 
+            background: model ? 'rgba(16, 185, 129, 0.1)' : 'rgba(251, 191, 36, 0.1)',
+            color: model ? 'var(--success)' : '#FBBF24',
+            borderColor: model ? 'rgba(16, 185, 129, 0.2)' : 'rgba(251, 191, 36, 0.2)'
+          }}>
+            {model ? 'SYSTEM ONLINE' : 'INITIALIZING...'}
+          </div>
         </header>
 
-        <div style={styles.statusBox}>
-          <div style={styles.statusLabel}>Status</div>
-          <div style={{ ...styles.statusValue, color: listening ? '#137333' : '#b00020' }}>
-            {listening ? '👂 Listening...' : 'Standby'}
+        <div style={{ marginBottom: '24px', textAlign: 'left' }}>
+          <label style={{ fontSize: '0.75rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>MONITORING STATUS</label>
+          <div style={{ 
+            fontSize: '1.25rem', 
+            fontWeight: '700', 
+            color: listening ? 'var(--success)' : 'var(--danger)',
+            marginTop: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            {listening && <span className="pulse-dot" style={{ width: '8px', height: '8px', background: 'var(--success)', borderRadius: '50%' }}></span>}
+            {listening ? 'ACTIVE LISTENING' : 'SYSTEM STANDBY'}
           </div>
         </div>
 
-        <div style={styles.heardBox}>
-          <div style={styles.heardLabel}>Last detected word</div>
-          <div style={styles.heardWord}>{action ? action.toUpperCase() : '—'}</div>
+        <div className="glass-panel" style={{ background: 'rgba(0,0,0,0.2)', padding: '24px', marginBottom: '32px', textAlign: 'center' }}>
+          <label style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'block', marginBottom: '12px' }}>LAST AUDITORY PATTERN</label>
+          <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)', letterSpacing: '0.1em' }}>
+            {action ? action.toUpperCase() : '---'}
+          </div>
         </div>
 
         {!listening ? (
-          <button onClick={startListening} disabled={!model} style={{ ...styles.primaryBtn, opacity: model ? 1 : 0.5 }}>
-            Start Listening
+          <button 
+            className="spy-btn btn-primary" 
+            onClick={startListening} 
+            disabled={!model}
+          >
+            ACTIVATE SENTINEL
           </button>
         ) : (
-          <button onClick={stopListening} style={styles.dangerBtn}>Stop Listening</button>
+          <button className="spy-btn btn-danger" onClick={stopListening}>
+            DEACTIVATE SYSTEM
+          </button>
         )}
 
-        <p style={styles.helper}>Say <b>“STOP”</b> loudly to trigger SOS</p>
-        <button onClick={() => navigate('/dashboard')} style={styles.linkBtn}>Back to Dashboard</button>
+        <div style={{ marginTop: '24px', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
+            Trigger Keyword: <span style={{ color: 'var(--text-main)', fontWeight: '700' }}>"STOP"</span>
+          </p>
+          <button 
+            onClick={() => navigate('/dashboard')} 
+            style={{ 
+              marginTop: '16px', 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--primary)', 
+              cursor: 'pointer', 
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }}
+          >
+            Return to Control Center
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  page: { minHeight: '100vh', background: '#0e0f12', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif' },
-  card: { width: '100%', maxWidth: '520px', background: '#16181d', borderRadius: '16px', padding: '28px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)', color: '#eaeaea' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' },
-  title: { fontSize: '26px', fontWeight: '600', margin: 0 },
-  badge: { padding: '6px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '500' },
-  statusBox: { marginBottom: '20px' },
-  statusLabel: { fontSize: '12px', color: '#9aa0a6' },
-  statusValue: { fontSize: '18px', fontWeight: '600' },
-  heardBox: { background: '#0f1115', borderRadius: '12px', padding: '16px', marginBottom: '24px' },
-  heardLabel: { fontSize: '12px', color: '#9aa0a6' },
-  heardWord: { fontSize: '24px', marginTop: '6px', fontWeight: '600', color: '#fff' },
-  primaryBtn: { width: '100%', padding: '14px', borderRadius: '12px', border: 'none', fontSize: '16px', fontWeight: '600', background: '#1a73e8', color: '#fff', cursor: 'pointer' },
-  dangerBtn: { width: '100%', padding: '14px', borderRadius: '12px', border: 'none', fontSize: '16px', fontWeight: '600', background: '#d93025', color: '#fff', cursor: 'pointer' },
-  helper: { marginTop: '12px', fontSize: '13px', color: '#9aa0a6', textAlign: 'center' },
-  linkBtn: { marginTop: '18px', background: 'none', border: 'none', color: '#8ab4f8', cursor: 'pointer', fontSize: '14px', width: '100%' }
 };
 
 export default Sentinel;

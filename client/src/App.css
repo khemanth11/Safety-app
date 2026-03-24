@@ -1,427 +1,354 @@
 /* File: client/src/App.css */
 
-/* --- PWA MOBILE GLOBALS --- */
+/* --- GLOBALS & UTILITIES --- */
 * {
-  /* Remove the 300ms tap delay on mobile browsers */
   touch-action: manipulation;
-  /* Remove the blue flash on tap (Android Chrome) */
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
 }
 
-/* --- 1. THE GLOBAL HACKER THEME --- */
 body {
   margin: 0;
-  background-color: #050505;
-  /* Deepest black */
-  color: #0f0;
-  /* Terminal Green */
-  font-family: 'Courier New', Courier, monospace;
-  /* Spy Font */
-  overflow-x: hidden;
-  /* Prevent side scrolling */
-  /* 100dvh = dynamic viewport height — accounts for mobile browser chrome */
-  min-height: 100dvh;
-  /* Safe area for phones with notch / home indicator */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-  /* Prevent text size adjustment on orientation change */
   -webkit-text-size-adjust: 100%;
 }
 
-/* --- 2. THE BACKGROUND GRID (Sci-Fi Effect) --- */
-.dashboard-container,
-body {
-  background-image:
-    linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-  /* Creates the tactical grid */
-  position: relative;
+/* --- GLASSMORPHISM & CONTAINERS --- */
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-premium);
 }
 
-/* Scanline animation (The moving CRT line) */
-body::before {
-  content: " ";
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02));
-  z-index: 999;
-  background-size: 100% 2px, 3px 100%;
-  pointer-events: none;
-  /* Allows clicking through it */
-}
-
-/* --- 3. AUTH & SHARED CONTAINERS --- */
 .auth-container {
-  width: 100%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 440px;
   padding: 40px;
-  margin: 50px auto;
-  /* Centering */
-  background: rgba(10, 10, 10, 0.95);
-  border: 1px solid #0f0;
-  /* Glowing Green Border */
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+  margin: 80px auto;
   text-align: center;
   position: relative;
-  z-index: 1000;
+  z-index: 10;
+  background: var(--bg-surface);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-premium);
 }
 
-h1,
-h2 {
-  color: #fff;
-  text-shadow: 0 0 10px #0f0;
-  /* Glowing Text */
-  letter-spacing: 3px;
-  margin-bottom: 25px;
-  text-transform: uppercase;
+h1, h2 {
+  color: var(--text-main);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
 }
 
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.5rem; }
+
+p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* --- INPUTS --- */
 .spy-input {
   width: 100%;
-  padding: 15px;
-  margin: 10px 0;
-  background-color: #000;
-  border: 1px solid #333;
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 16px;
-  border-radius: 5px;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
+  padding: 14px 18px;
+  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  font-size: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .spy-input:focus {
   outline: none;
-  border-color: #0f0;
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* --- 4. BUTTONS (Tactical Style) --- */
+/* --- BUTTONS --- */
 .spy-btn {
   width: 100%;
-  padding: 15px;
+  padding: 14px 24px;
   margin-top: 20px;
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
   border: none;
+  color: var(--text-main);
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  position: relative;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  /* Sci-Fi Corner Cut */
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .btn-primary {
-  background: rgba(0, 50, 0, 0.9);
-  color: #0f0;
-  border: 1px solid #0f0;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .btn-primary:hover {
-  background: #0f0;
-  color: #000;
-  box-shadow: 0 0 20px #0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--primary-glow);
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
-  background: #000;
-  color: #0088ff;
-  border: 1px solid #0088ff;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover {
-  background: #0088ff;
-  color: #000;
-  box-shadow: 0 0 20px #0088ff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary);
 }
 
-.link-text {
-  margin-top: 20px;
-  font-size: 12px;
-  color: #666;
-  cursor: pointer;
-  display: block;
+.btn-danger {
+  background: var(--danger);
+  color: white;
 }
 
-.link-text:hover {
-  color: #fff;
-  text-decoration: underline;
+.btn-danger:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
-/* --- 5. DASHBOARD LAYOUT --- */
+/* --- DASHBOARD & LAYOUT --- */
 .dashboard-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 40px 20px;
   min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .header-section {
   text-align: center;
-  margin-bottom: 20px;
-  z-index: 10;
-  border-bottom: 1px solid #333;
+  margin-bottom: 48px;
   width: 100%;
-  max-width: 500px;
-  padding-bottom: 10px;
 }
 
-/* --- 6. THE PULSING SOS BUTTON (Red Heartbeat) --- */
+.status-bar {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  margin-bottom: 24px;
+}
+
+/* --- TACTICAL MENU (Grid) --- */
+.tactical-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.tactical-menu .spy-btn {
+  margin-top: 0;
+  height: 110px;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  color: #FFFFFF; /* Force White for maximum visibility */
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.tactical-menu .spy-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* --- PANIC BUTTON --- */
 .panic-container {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0;
-  z-index: 10;
+  margin: 40px 0;
 }
 
 .panic-btn {
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  background: radial-gradient(circle, #ff0000 0%, #500000 100%);
-  border: 4px solid #ff4444;
+  background: radial-gradient(circle at 30% 30%, #FF6B6B 0%, #EF4444 100%);
+  border: 8px solid rgba(239, 68, 68, 0.2);
   color: white;
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 2.25rem;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 0 30px #ff0000, inset 0 0 20px #500000;
-  animation: pulse 1.5s infinite;
-  /* Faster Heartbeat */
-  z-index: 100;
-  text-shadow: 0 0 5px black;
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.4), inset 0 4px 12px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.panic-btn::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--danger);
+  opacity: 0.3;
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.panic-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 60px rgba(239, 68, 68, 0.6);
 }
 
 .panic-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 0 60px #ff0000;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
-  }
-
-  70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
-  }
-
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-  }
-}
-
-/* --- 7. STATUS BAR --- */
-.status-bar {
-  background: #000;
-  color: #0ff;
-  /* Cyan Status */
-  padding: 10px 20px;
-  border: 1px solid #0ff;
-  border-radius: 0;
-  /* Square edges for tactical look */
-  margin-bottom: 30px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-  z-index: 10;
-}
-
-/* --- 8. TACTICAL MENU --- */
-.tactical-menu {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  width: 100%;
-  max-width: 400px;
-  z-index: 10;
-  padding-bottom: 50px;
-}
-
-/* Reusing spy-btn styles, but specific overrides if needed */
-.tactical-menu .spy-btn {
-  margin-top: 0;
-  /* Remove top margin in grid */
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Danger Button Override */
-.spy-btn.danger {
-  border-color: #ffaa00;
-  color: #ffaa00;
-}
-
-.spy-btn.danger:hover {
-  background: #ffaa00;
-  color: #000;
-  box-shadow: 0 0 15px #ffaa00;
-}
-
-/* --- 9. CALCULATOR (Disguise Mode) --- */
+/* --- CALCULATOR (DISGUISE) --- */
 .calculator-container {
-  width: 350px;
-  background-color: #000;
+  width: min(100%, 400px);
+  background: #000;
   padding: 20px;
-  border-radius: 30px;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-  border: 2px solid #222;
-  margin: 50px auto;
-  z-index: 1000;
-  position: relative;
+  border-radius: 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  margin: 40px auto;
+  border: 1px solid #222;
+  display: flex;
+  flex-direction: column;
 }
 
 .display {
-  background-color: #0a0a0a;
   color: white;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Keep normal font for disguise */
-  font-size: 4rem;
+  font-size: 5rem;
   text-align: right;
-  padding: 20px;
-  margin-bottom: 20px;
-  height: 80px;
-  border-radius: 10px;
+  padding: 40px 10px 10px;
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  font-weight: 300;
+  overflow: hidden;
 }
 
 .keypad {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
+  gap: 12px;
+  width: 100%;
 }
 
-button {
-  width: 70px;
-  height: 70px;
+.keypad button {
+  aspect-ratio: 1;
+  width: 100%;
   border-radius: 50%;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer;
-  transition: opacity 0.2s;
-  /* Prevent double-tap zoom on mobile */
-  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  padding: 0;
 }
 
-button:active {
-  opacity: 0.7;
+.keypad button:active {
+  filter: brightness(1.5);
 }
 
-.btn-gray {
-  background-color: #a5a5a5;
-  color: black;
-}
+.btn-gray { background: #A5A5A5; color: black; }
+.btn-gray:active { background: #D4D4D2; }
 
-.btn-dark {
-  background-color: #333333;
-  color: white;
-}
+.btn-dark { background: #333333; color: white; }
+.btn-dark:active { background: #737373; }
 
-.btn-orange {
-  background-color: #ff9f0a;
-  color: white;
-}
+.btn-orange { background: #FF9F0A; color: white; }
+.btn-orange:active { background: #FCBF49; }
 
 .btn-zero {
   grid-column: span 2;
-  width: 100%;
-  border-radius: 40px;
+  aspect-ratio: auto !important;
+  border-radius: 100px !important;
+  justify-content: flex-start !important;
+  padding-left: 20% !important;
 }
 
-/* --- 10. MOBILE / PWA RESPONSIVE --- */
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 640px) {
+  .auth-container {
+    width: 100%;
+    margin: 0;
+    min-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px;
+  }
 
-/* On phones: fill the full screen like a native app */
-@media (max-width: 500px) {
   .calculator-container {
     width: 100%;
-    min-height: 100dvh;
-    padding: 20px 15px;
-    border: none;
-    border-radius: 0;
+    height: 100dvh;
     margin: 0;
+    border-radius: 0;
+    border: none;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    /* Push keypad to bottom like iOS calculator */
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
   }
 
-  .display {
-    font-size: 3.5rem;
-    height: auto;
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    margin-bottom: 15px;
-  }
-
-  .keypad {
+  .display { font-size: 3.5rem; height: auto; flex: 1; }
+  
+  .tactical-menu {
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-
-  button {
-    /* Auto-size buttons based on available width */
-    width: 100%;
-    height: 0;
-    padding-bottom: 100%;
-    /* Makes buttons perfectly square */
-    font-size: 1.4rem;
-    position: relative;
-  }
-
-  button span,
-  button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-zero {
-    grid-column: span 2;
-    width: 100%;
-    height: auto;
-    padding: 0;
-    aspect-ratio: auto;
-    border-radius: 40px;
-    padding: 20px 0;
-    font-size: 1.4rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .auth-container {
-    padding: 20px;
-    width: 90%;
-  }
-
+  
   .panic-btn {
-    width: 150px;
-    height: 150px;
-    font-size: 1.8rem;
+    width: 180px;
+    height: 180px;
+    font-size: 1.75rem;
   }
 }
 
-/* PWA standalone mode — hide any browser-only UI artifacts */
-@media (display-mode: standalone) {
-  body {
-    /* Extra top padding for status bar area on phones */
-    padding-top: max(env(safe-area-inset-top), 12px);
+@media (min-width: 1024px) {
+  .tactical-menu {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
